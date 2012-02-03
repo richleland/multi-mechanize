@@ -23,7 +23,7 @@ $(function(){
       title: {
         text: 'Elapsed Time (secs)'
       },
-      categories: [0, 100, 200, 300, 400, 500, 600]
+      type: 'datetime'
     },
     yAxis: {
       title: {
@@ -33,18 +33,28 @@ $(function(){
     series: [
       {
         name: '90%',
-        data: [3.570, 3.725, 3.479, 3.545, 3.493, 3.623, 3.544]
+        data: [3.570, 3.725, 3.479, 3.545, 3.493, 3.623, 3.544],
+        pointStart: Date.UTC(2010, 0, 1),
+        pointInterval: 10 * 1000
       },
       {
         name: '80%',
-        data: [3.561, 3.609, 3.447, 3.469, 3.442, 3.437, 3.400]
+        data: [3.561, 3.609, 3.447, 3.469, 3.442, 3.437, 3.400],
+        pointStart: Date.UTC(2010, 0, 1),
+        pointInterval: 10 * 1000
       },
       {
         name: 'avg',
-        data: [3.455, 3.460, 3.346, 3.400, 3.300, 3.260, 3.273]
+        data: [3.455, 3.460, 3.346, 3.400, 3.300, 3.260, 3.273],
+        pointStart: Date.UTC(2010, 0, 1),
+        pointInterval: 10 * 1000
       }
     ]
   };
 
   chart = new Highcharts.Chart(options);
+  // options.series[0].data = []
+  // options.series[1].data = []
+  // options.series[2].data = []
+  // chart = new Highcharts.Chart(options)
 });
