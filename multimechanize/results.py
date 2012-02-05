@@ -133,7 +133,8 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
             'name': timer_name,
             'throughput_points': {},
             'summary': {},
-            'intervals': []
+            'intervals': [],
+            'trans_timer_points': []
         }
 
         custom_timer_vals = []
@@ -145,6 +146,7 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
                 custom_timer_vals.append(val)
             except KeyError:
                 pass
+        timer['trans_timer_points'] = custom_timer_points
         #graph.resp_graph_raw(custom_timer_points, timer_name + '_response_times.png', results_dir)
 
         interval_secs = ts_interval
