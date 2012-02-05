@@ -14,9 +14,9 @@ from shutil import copytree
 
 from jinja2 import Environment, FileSystemLoader, PackageLoader, Template
 
-import graph
-import reportwriter
-import reportwriterxml
+#import graph
+#import reportwriter
+#import reportwriterxml
 
 
 def copy_static_media(results_dir):
@@ -63,13 +63,13 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     # all transactions - transaction response summary
     transaction_summary = {
         'count': results.total_transactions,
-        'min': min(trans_timer_vals),
-        'avg': average(trans_timer_vals),
-        'pct_80': percentile(trans_timer_vals, 80),
-        'pct_90': percentile(trans_timer_vals, 90),
-        'pct_95': percentile(trans_timer_vals, 95),
-        'max': max(trans_timer_vals),
-        'stdev': standard_dev(trans_timer_vals),
+        'min': '%.3f' % min(trans_timer_vals),
+        'avg': '%.3f' % average(trans_timer_vals),
+        'pct_80': '%.3f' % percentile(trans_timer_vals, 80),
+        'pct_90': '%.3f' % percentile(trans_timer_vals, 90),
+        'pct_95': '%.3f' % percentile(trans_timer_vals, 95),
+        'max': '%.3f' % max(trans_timer_vals),
+        'stdev': '%.3f' % standard_dev(trans_timer_vals),
     }
 
     # all transactions - interval details
@@ -99,13 +99,13 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
 
         if cnt > 0:
             interval['rate'] = cnt / float(interval_secs)
-            interval['min'] = min(bucket)
-            interval['avg'] = average(bucket)
-            interval['pct_80'] = percentile(bucket, 80)
-            interval['pct_90'] = percentile(bucket, 90)
-            interval['pct_95'] = percentile(bucket, 95)
-            interval['max'] = max(bucket)
-            interval['stdev'] = standard_dev(bucket)
+            interval['min'] = '%.3f' % min(bucket)
+            interval['avg'] = '%.3f' % average(bucket)
+            interval['pct_80'] = '%.3f' % percentile(bucket, 80)
+            interval['pct_90'] = '%.3f' % percentile(bucket, 90)
+            interval['pct_95'] = '%.3f' % percentile(bucket, 95)
+            interval['max'] = '%.3f' % max(bucket)
+            interval['stdev'] = '%.3f' % standard_dev(bucket)
 
             avg_resptime_points[interval_start] = interval['avg']
             percentile_80_resptime_points[interval_start] = interval['pct_80']
