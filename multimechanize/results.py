@@ -129,6 +129,12 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     # custom timers
     custom_timers = []
     for timer_name in sorted(results.uniq_timer_names):
+        timer = {
+            'name': timer_name,
+            'throughput_points': {},
+            'summary': {}
+        }
+
         custom_timer_vals = []
         custom_timer_points = []
         for resp_stats in results.resp_stats_list:
@@ -140,27 +146,25 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
                 pass
         #graph.resp_graph_raw(custom_timer_points, timer_name + '_response_times.png', results_dir)
 
-        throughput_points = {}  # {intervalnumber: numberofrequests}
         interval_secs = ts_interval
         splat_series = split_series(custom_timer_points, interval_secs)
         for i, bucket in enumerate(splat_series):
-            throughput_points[int((i + 1) * interval_secs)] = (len(bucket) / interval_secs)
+            timer['throughput_points'][int((i + 1) * interval_secs)] = (len(bucket) / interval_secs)
         #graph.tp_graph(throughput_points, timer_name + '_throughput.png', results_dir)
 
-        custom_timers.append({
-            'timer_name': timer_name,
-        })
+        # custom timer summary
+        timer['summary'] = {
+            'count': len(custom_timer_vals),
+            'min': '%.3f' % min(custom_timer_vals),
+            'avg': '%.3f' % average(custom_timer_vals),
+            'pct_80': '%.3f' % percentile(custom_timer_vals, 80),
+            'pct_90': '%.3f' % percentile(custom_timer_vals, 90),
+            'pct_95': '%.3f' % percentile(custom_timer_vals, 95),
+            'max': '%.3f' % max(custom_timer_vals),
+            'stdev': '%.3f' % standard_dev(custom_timer_vals),
+        }
 
-        #report.write_line('<tr><td>%i</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td></tr>'  % (
-            #len(custom_timer_vals),
-            #min(custom_timer_vals),
-            #average(custom_timer_vals),
-            #percentile(custom_timer_vals, 80),
-            #percentile(custom_timer_vals, 90),
-            #percentile(custom_timer_vals, 95),
-            #max(custom_timer_vals),
-            #standard_dev(custom_timer_vals)
-        #))
+        custom_timers.append(timer)
 
         # custom timers - interval details
         #avg_resptime_points = {}  # {intervalnumber: avg_resptime}
