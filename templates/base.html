@@ -3,14 +3,146 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <title>Multi-Mechanize Performance Test Results</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-    <script src="js/highcharts/highcharts.js" type="text/javascript"></script>
-    <script src="js/bootstrap-dropdown.js" type="text/javascript"></script>
-    <script src="js/multi-mechanize.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
-    <link rel="stylesheet" href="css/multi-mechanize.css" type="text/css">
-    <style type="text/css">
+    <script src="../static/js/highcharts/highcharts.js" type="text/javascript"></script>
+    <script src="../static/js/bootstrap-dropdown.js" type="text/javascript"></script>
+    <!--<script src="../static/js/multi-mechanize.js" type="text/javascript"></script>-->
+    <script type="text/javascript" charset="utf-8">
+      var responseTimeLineGraph;
+      var responseTimeScatterGraph;
+      var throughputGraph;
 
-    </style>
+      var startDate = Date.UTC(2010, 0, 1);
+      var pointInterval = {{ ts_interval }} * 1000;
+
+      var responseTimeLineGraphOptions = {
+        chart: {
+          renderTo: 'responseTimeLineGraph',
+          defaultSeriesType: 'line'
+        },
+        legend: {
+          align: 'right',
+          verticalAlign: 'top',
+          x: -10,
+          y: 10,
+          floating: true,
+          layout: 'vertical'
+        },
+        title: {
+          text: 'Response Time: 10 sec time-series'
+        },
+        xAxis: {
+          title: {
+            text: 'Elapsed Time (secs)'
+          },
+          type: 'datetime'
+        },
+        yAxis: {
+          title: {
+            text: 'Response Time (secs)'
+          }
+        },
+        series: [
+          {
+            name: '90%',
+            pointStart: startDate,
+            pointInterval: pointInterval
+          },
+          {
+            name: '80%',
+            pointStart: startDate,
+            pointInterval: pointInterval
+          },
+          {
+            name: 'avg',
+            pointStart: startDate,
+            pointInterval: pointInterval
+          }
+        ]
+      };
+
+      var responseTimeScatterGraphOptions = {
+        chart: {
+          renderTo: 'responseTimeScatterGraph',
+          defaultSeriesType: 'scatter'
+        },
+        legend: {
+          enabled: false
+        },
+        title: {
+          text: 'Response Time: raw data (all points)'
+        },
+        xAxis: {
+          title: {
+            text: 'Elapsed Time (secs)'
+          },
+          type: 'datetime'
+        },
+        yAxis: {
+          title: {
+            text: 'Response Time (secs)'
+          }
+        },
+        series: [
+          {
+            name: '90%',
+            pointStart: startDate,
+            pointInterval: pointInterval
+          }
+        ]
+      };
+
+      var throuputGraphOptions = {
+        chart: {
+          renderTo: 'throughputGraph',
+          defaultSeriesType: 'line'
+        },
+        legend: {
+          enabled: false
+        },
+        title: {
+          text: 'Throughput: 5 sec time-series'
+        },
+        xAxis: {
+          title: {
+            text: 'Elapsed Time (secs)'
+          },
+          type: 'datetime'
+        },
+        yAxis: {
+          title: {
+            text: 'Transactions Per Second (count)'
+          }
+        },
+        series: [
+          {
+            name: 'transactions',
+            pointStart: startDate,
+            pointInterval: pointInterval
+          }
+        ]
+      };
+
+      $(function(){
+        // twitter bootstrap dropdown
+        $('.dropdown-toggle').dropdown();
+
+        // render the response time line graph
+        responseTimeLineGraphOptions.series[0].data = [{% for interval in intervals %}{{ interval.pct_90 }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeLineGraphOptions.series[1].data = [{% for interval in intervals %}{{ interval.pct_80 }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeLineGraphOptions.series[2].data = [{% for interval in intervals %}{{ interval.avg }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeLineGraph = new Highcharts.Chart(responseTimeLineGraphOptions)
+
+        // render the response time scatter graph
+        responseTimeScatterGraphOptions.series[0].data = [{% for elapsed, value in trans_timer_points %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeScatterGraph = new Highcharts.Chart(responseTimeScatterGraphOptions)
+
+        // render the throughput graph
+        throuputGraphOptions.series[0].data = [{% for interval, point in throughput_points.items() %}{{ point }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        throughputGraph = new Highcharts.Chart(throuputGraphOptions)
+      });
+    </script>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="../static/css/multi-mechanize.css" type="text/css">
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -43,35 +175,36 @@
           <tbody>
             <tr>
               <th>transactions</th>
-              <td>4688</td>
+              <td>{{ total_transactions }}</td>
             </tr>
             <tr>
               <th>errors</th>
-              <td>0</td>
+              <td>{{ total_errors }}</td>
             </tr>
             <tr>
               <th>run time</th>
-              <td>600 secs</td>
+              <td>{{ run_time }} secs</td>
             </tr>
             <tr>
               <th>rampup time</th>
-              <td>600 secs</td>
+              <td>{{ rampup }} secs</td>
             </tr>
             <tr>
               <th>start time</th>
-              <td>November 11, 2011 13:17:16</td>
+              <td>{{ start_datetime }}</td>
             </tr>
             <tr>
               <th>end time</th>
-              <td>November 11, 2011 13:27:12</td>
+              <td>{{ finish_datetime }}</td>
             </tr>
             <tr>
               <th>time-series interval</th>
-              <td>10 secs</td>
+              <td>{{ ts_interval }} secs</td>
             </tr>
           </tbody>
         </table>
 
+        {% if user_group_configs %}
         <h3>Workload configuration</h3>
         <table class="table table-striped table-bordered table-condensed">
           <thead>
@@ -82,18 +215,16 @@
             </tr>
           </thead>
           <tbody>
+            {% for config in user_group_configs %}
             <tr>
-              <td>user_group-1</td>
-              <td>25</td>
-              <td>random_pages.py</td>
+              <td>{{ config.name }}</td>
+              <td>{{ config.num_threads }}</td>
+              <td>{{ config.script_file }}</td>
             </tr>
-            <tr>
-              <td>user_group-2</td>
-              <td>25</td>
-              <td>random_pages.py</td>
-            </tr>
+            {% endfor %}
           </tbody>
         </table>
+        {% endif %}
       </section>
 
       <section id="all-transactions">
@@ -116,14 +247,14 @@
           </thead>
           <tbody>
             <tr>
-              <td>4688</td>
-              <td>3.075</td>
-              <td>3.344</td>
-              <td>3.463</td>
-              <td>3.551</td>
-              <td>3.651</td>
-              <td>6.808</td>
-              <td>0.326</td>
+              <td>{{ transaction_summary.count }}</td>
+              <td>{{ transaction_summary.min }}</td>
+              <td>{{ transaction_summary.avg }}</td>
+              <td>{{ transaction_summary.pct_80 }}</td>
+              <td>{{ transaction_summary.pct_90 }}</td>
+              <td>{{ transaction_summary.pct_95 }}</td>
+              <td>{{ transaction_summary.max }}</td>
+              <td>{{ transaction_summary.stdev }}</td>
             </tr>
           </tbody>
         </table>
@@ -145,24 +276,28 @@
             </tr>
           </thead>
           <tbody>
+            {% for interval in intervals %}
             <tr>
-              <td>1</td>
-              <td>6</td>
-              <td>0.60</td>
-              <td>3.344</td>
-              <td>3.455</td>
-              <td>3.561</td>
-              <td>3.570</td>
-              <td>3.570</td>
-              <td>3.570</td>
-              <td>0.100</td>
+              <td>{{ interval.num }}</td>
+              <td>{{ interval.count }}</td>
+              <td>{{ interval.rate }}</td>
+              <td>{{ interval.min }}</td>
+              <td>{{ interval.avg }}</td>
+              <td>{{ interval.pct_80 }}</td>
+              <td>{{ interval.pct_90 }}</td>
+              <td>{{ interval.pct_95 }}</td>
+              <td>{{ interval.max }}</td>
+              <td>{{ interval.stdev }}</td>
             </tr>
+            {% endfor %}
           </tbody>
         </table>
       </section>
 
       <h3>Graphs</h3>
-      <div id="chartContainer"></div>
+      <div id="responseTimeLineGraph"></div>
+      <div id="responseTimeScatterGraph"></div>
+      <div id="throughputGraph"></div>
 
       <footer class="footer">
         <p>Results generated using <b>Multi-Mechanize</b></p>
