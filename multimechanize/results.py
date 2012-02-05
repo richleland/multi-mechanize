@@ -126,62 +126,31 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     # MATPLOTLIB GRAPH WAS CREATED HERE USING THE FOLLOWING CALL:
     #graph.tp_graph(throughput_points, 'All_Transactions_throughput.png', results_dir)
 
-    # render the template with the data
-    rendered = template.render({
-        'total_transactions': total_transactions,
-        'total_errors': total_errors,
-        'run_time': run_time,
-        'rampup': rampup,
-        'start_datetime': start_datetime,
-        'finish_datetime': finish_datetime,
-        'ts_interval': ts_interval,
-        'user_group_configs': user_group_configs,
-        'transaction_summary': transaction_summary,
-        'points_avg': avg_resptime_points,
-        'points_pct_80': percentile_80_resptime_points,
-        'points_pct_90': percentile_90_resptime_points,
-        'intervals': intervals,
-        'trans_timer_points': trans_timer_points,
-        'throughput_points': throughput_points,
-    })
-
-    # write the rendered template to disk
-    output_file = os.path.join(results_dir, 'results.html')
-    with open(output_file, 'w') as f:
-        f.write(rendered)
-
-    ## write the results in XML
-    #if xml_reports:
-        #reportwriterxml.write_jmeter_output(results.resp_stats_list, results_dir)
-
-
-    ## custom timers
-    #for timer_name in sorted(results.uniq_timer_names):
-        #custom_timer_vals = []
-        #custom_timer_points = []
-        #for resp_stats in results.resp_stats_list:
-            #try:
-                #val = resp_stats.custom_timers[timer_name]
-                #custom_timer_points.append((resp_stats.elapsed_time, val))
-                #custom_timer_vals.append(val)
-            #except KeyError:
-                #pass
+    # custom timers
+    custom_timers = []
+    for timer_name in sorted(results.uniq_timer_names):
+        custom_timer_vals = []
+        custom_timer_points = []
+        for resp_stats in results.resp_stats_list:
+            try:
+                val = resp_stats.custom_timers[timer_name]
+                custom_timer_points.append((resp_stats.elapsed_time, val))
+                custom_timer_vals.append(val)
+            except KeyError:
+                pass
         #graph.resp_graph_raw(custom_timer_points, timer_name + '_response_times.png', results_dir)
 
-        #throughput_points = {}  # {intervalnumber: numberofrequests}
-        #interval_secs = ts_interval
-        #splat_series = split_series(custom_timer_points, interval_secs)
-        #for i, bucket in enumerate(splat_series):
-            #throughput_points[int((i + 1) * interval_secs)] = (len(bucket) / interval_secs)
+        throughput_points = {}  # {intervalnumber: numberofrequests}
+        interval_secs = ts_interval
+        splat_series = split_series(custom_timer_points, interval_secs)
+        for i, bucket in enumerate(splat_series):
+            throughput_points[int((i + 1) * interval_secs)] = (len(bucket) / interval_secs)
         #graph.tp_graph(throughput_points, timer_name + '_throughput.png', results_dir)
 
-        #report.write_line('<hr />')
-        #report.write_line('<h2>Custom Timer: %s</h2>' % timer_name)
+        custom_timers.append({
+            'timer_name': timer_name,
+        })
 
-        #report.write_line('<h3>Timer Summary (secs)</h3>')
-
-        #report.write_line('<table>')
-        #report.write_line('<tr><th>count</th><th>min</th><th>avg</th><th>80pct</th><th>90pct</th><th>95pct</th><th>max</th><th>stdev</th></tr>')
         #report.write_line('<tr><td>%i</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td></tr>'  % (
             #len(custom_timer_vals),
             #min(custom_timer_vals),
@@ -192,10 +161,8 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
             #max(custom_timer_vals),
             #standard_dev(custom_timer_vals)
         #))
-        #report.write_line('</table>')
 
-
-        ## custom timers - interval details
+        # custom timers - interval details
         #avg_resptime_points = {}  # {intervalnumber: avg_resptime}
         #percentile_80_resptime_points = {}  # {intervalnumber: 80pct_resptime}
         #percentile_90_resptime_points = {}  # {intervalnumber: 90pct_resptime}
@@ -237,8 +204,6 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         #report.write_line('<h4>Throughput: %s sec time-series</h4>' % ts_interval)
         #report.write_line('<img src="%s_throughput.png"></img>' % timer_name)
 
-
-
     ### user group times
     ##for user_group_name in sorted(results.uniq_user_group_names):
     ##    ug_timer_vals = []
@@ -254,9 +219,34 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     ##    print 'max: %.3f' % max(ug_timer_vals)
     ##    print ''
 
-    #report.write_line('<hr />')
-    #report.write_closing_html()
+    # render the template with the data
+    rendered = template.render({
+        'total_transactions': total_transactions,
+        'total_errors': total_errors,
+        'run_time': run_time,
+        'rampup': rampup,
+        'start_datetime': start_datetime,
+        'finish_datetime': finish_datetime,
+        'ts_interval': ts_interval,
+        'user_group_configs': user_group_configs,
+        'transaction_summary': transaction_summary,
+        'points_avg': avg_resptime_points,
+        'points_pct_80': percentile_80_resptime_points,
+        'points_pct_90': percentile_90_resptime_points,
+        'intervals': intervals,
+        'trans_timer_points': trans_timer_points,
+        'throughput_points': throughput_points,
+        'custom_timers': custom_timers,
+    })
 
+    # write the rendered template to disk
+    output_file = os.path.join(results_dir, 'results.html')
+    with open(output_file, 'w') as f:
+        f.write(rendered)
+
+    ## write the results in XML
+    #if xml_reports:
+        #reportwriterxml.write_jmeter_output(results.resp_stats_list, results_dir)
 
 
 

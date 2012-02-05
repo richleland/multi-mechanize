@@ -170,8 +170,9 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom timers<b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Home page</a></li>
-                <li><a href="#">Random page</a></li>
+                {% for timer in custom_timers -%}
+                <li><a href="custom-timer-{{ loop.index }}">{{ timer.timer_name }}</a></li>
+                {%- endfor %}
               </ul>
             </li>
           </ul>
@@ -307,12 +308,86 @@
             {% endfor %}
           </tbody>
         </table>
+
+        <h3>Graphs</h3>
+        <div id="responseTimeLineGraph" class="graph"></div>
+        <div id="responseTimeScatterGraph" class="graph"></div>
+        <div id="throughputGraph" class="graph"></div>
       </section>
 
-      <h3>Graphs</h3>
-      <div id="responseTimeLineGraph" class="graph"></div>
-      <div id="responseTimeScatterGraph" class="graph"></div>
-      <div id="throughputGraph" class="graph"></div>
+      {% for timer in custom_timers %}
+      <section id="custom-timer-{{ loop.index }}">
+        <div class="page-header">
+          <h2>Custom timer: {{ timer.timer_name }}</h2>
+        </div>
+        <h3>Timer summary (secs)</h3>
+        <table class="table table-striped table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th>count</th>
+              <th>min</th>
+              <th>avg</th>
+              <th>80%</th>
+              <th>90%</th>
+              <th>95%</th>
+              <th>max</th>
+              <th>stdev</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ timer.summary.count }}</td>
+              <td>{{ timer.summary.min }}</td>
+              <td>{{ timer.summary.avg }}</td>
+              <td>{{ timer.summary.pct_80 }}</td>
+              <td>{{ timer.summary.pct_90 }}</td>
+              <td>{{ timer.summary.pct_95 }}</td>
+              <td>{{ timer.summary.max }}</td>
+              <td>{{ timer.summary.stdev }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Interval details (secs)</h3>
+        <table class="table table-striped table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th>interval</th>
+              <th>count</th>
+              <th>rate</th>
+              <th>min</th>
+              <th>avg</th>
+              <th>80%</th>
+              <th>90%</th>
+              <th>95%</th>
+              <th>max</th>
+              <th>stdev</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for interval in timer.intervals %}
+            <tr>
+              <td>{{ interval.num }}</td>
+              <td>{{ interval.count }}</td>
+              <td>{{ interval.rate }}</td>
+              <td>{{ interval.min }}</td>
+              <td>{{ interval.avg }}</td>
+              <td>{{ interval.pct_80 }}</td>
+              <td>{{ interval.pct_90 }}</td>
+              <td>{{ interval.pct_95 }}</td>
+              <td>{{ interval.max }}</td>
+              <td>{{ interval.stdev }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <!--<h3>Graphs</h3>-->
+        <!--<div id="responseTimeLineGraph" class="graph"></div>-->
+        <!--<div id="responseTimeScatterGraph" class="graph"></div>-->
+        <!--<div id="throughputGraph" class="graph"></div>-->
+      </section>
+      {% endfor %}
 
       <footer class="footer">
         <p>Results generated using <b>Multi-Mechanize</b></p>
