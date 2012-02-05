@@ -16,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader, PackageLoader, Template
 
 #import graph
 #import reportwriter
-#import reportwriterxml
+import reportwriterxml
 
 
 def copy_static_media(results_dir):
@@ -207,21 +207,6 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         # add this timer to the list of custom timers
         custom_timers.append(timer)
 
-    ### user group times
-    ##for user_group_name in sorted(results.uniq_user_group_names):
-    ##    ug_timer_vals = []
-    ##    for resp_stats in results.resp_stats_list:
-    ##        if resp_stats.user_group_name == user_group_name:
-    ##            ug_timer_vals.append(resp_stats.trans_time)
-    ##    print user_group_name
-    ##    print 'min: %.3f' % min(ug_timer_vals)
-    ##    print 'avg: %.3f' % average(ug_timer_vals)
-    ##    print '80pct: %.3f' % percentile(ug_timer_vals, 80)
-    ##    print '90pct: %.3f' % percentile(ug_timer_vals, 90)
-    ##    print '95pct: %.3f' % percentile(ug_timer_vals, 95)
-    ##    print 'max: %.3f' % max(ug_timer_vals)
-    ##    print ''
-
     # render the template with the data
     rendered = template.render({
         'total_transactions': total_transactions,
@@ -244,9 +229,9 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     with open(output_file, 'w') as f:
         f.write(rendered)
 
-    ## write the results in XML
-    #if xml_reports:
-        #reportwriterxml.write_jmeter_output(results.resp_stats_list, results_dir)
+    # write the results in XML
+    if xml_reports:
+        reportwriterxml.write_jmeter_output(results.resp_stats_list, results_dir)
 
 
 
