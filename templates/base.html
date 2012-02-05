@@ -11,16 +11,17 @@
       var responseTimeScatterGraph;
       var throughputGraph;
 
-      var startDate = Date.UTC(2010, 0, 1);
-      var pointInterval = {{ ts_interval }} * 1000;
-
       var responseTimeLineGraphOptions = {
         chart: {
           renderTo: 'responseTimeLineGraph',
-          defaultSeriesType: 'line'
+          defaultSeriesType: 'line',
+          animation: false,
+          borderColor: '#E5E5E5',
+          borderWidth: 1
         },
         legend: {
           align: 'right',
+          backgroundColor: '#FFF',
           verticalAlign: 'top',
           x: -10,
           y: 10,
@@ -28,34 +29,36 @@
           layout: 'vertical'
         },
         title: {
-          text: 'Response Time: 10 sec time-series'
+          text: 'Response Time: {{ ts_interval }} sec time-series'
         },
         xAxis: {
           title: {
             text: 'Elapsed Time (secs)'
           },
-          type: 'datetime'
+          gridLineWidth: 1,
+          gridLineDashStyle: 'dot'
         },
         yAxis: {
           title: {
             text: 'Response Time (secs)'
+          },
+          min: 0
+        },
+        plotOptions: {
+          line: {
+            pointStart: 0,
+            pointInterval: {{ ts_interval }}
           }
         },
         series: [
           {
-            name: '90%',
-            pointStart: startDate,
-            pointInterval: pointInterval
+            name: '90%'
           },
           {
-            name: '80%',
-            pointStart: startDate,
-            pointInterval: pointInterval
+            name: '80%'
           },
           {
-            name: 'avg',
-            pointStart: startDate,
-            pointInterval: pointInterval
+            name: 'avg'
           }
         ]
       };
@@ -63,7 +66,10 @@
       var responseTimeScatterGraphOptions = {
         chart: {
           renderTo: 'responseTimeScatterGraph',
-          defaultSeriesType: 'scatter'
+          defaultSeriesType: 'scatter',
+          animation: false,
+          borderColor: '#E5E5E5',
+          borderWidth: 1
         },
         legend: {
           enabled: false
@@ -75,18 +81,23 @@
           title: {
             text: 'Elapsed Time (secs)'
           },
-          type: 'datetime'
+          gridLineWidth: 1,
+          gridLineDashStyle: 'dot'
         },
         yAxis: {
           title: {
             text: 'Response Time (secs)'
+          },
+          min: 0
+        },
+        plotOptions: {
+          line: {
+            pointStart: 0
           }
         },
         series: [
           {
-            name: '90%',
-            pointStart: startDate,
-            pointInterval: pointInterval
+            name: 'response time'
           }
         ]
       };
@@ -94,7 +105,10 @@
       var throuputGraphOptions = {
         chart: {
           renderTo: 'throughputGraph',
-          defaultSeriesType: 'line'
+          defaultSeriesType: 'line',
+          animation: false,
+          borderColor: '#E5E5E5',
+          borderWidth: 1
         },
         legend: {
           enabled: false
@@ -106,18 +120,24 @@
           title: {
             text: 'Elapsed Time (secs)'
           },
-          type: 'datetime'
+          gridLineWidth: 1,
+          gridLineDashStyle: 'dot'
         },
         yAxis: {
           title: {
             text: 'Transactions Per Second (count)'
+          },
+          min: 0
+        },
+        plotOptions: {
+          line: {
+            pointStart: 0,
+            pointInterval: {{ ts_interval }}
           }
         },
         series: [
           {
-            name: 'transactions',
-            pointStart: startDate,
-            pointInterval: pointInterval
+            name: 'transactions'
           }
         ]
       };
@@ -127,17 +147,17 @@
         $('.dropdown-toggle').dropdown();
 
         // render the response time line graph
-        responseTimeLineGraphOptions.series[0].data = [{% for interval in intervals %}{{ interval.pct_90 }}{% if not loop.last %}, {% endif %}{% endfor %}]
-        responseTimeLineGraphOptions.series[1].data = [{% for interval in intervals %}{{ interval.pct_80 }}{% if not loop.last %}, {% endif %}{% endfor %}]
-        responseTimeLineGraphOptions.series[2].data = [{% for interval in intervals %}{{ interval.avg }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeLineGraphOptions.series[0].data = [0, {% for interval in intervals %}{{ interval.pct_90 }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeLineGraphOptions.series[1].data = [0, {% for interval in intervals %}{{ interval.pct_80 }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeLineGraphOptions.series[2].data = [0, {% for interval in intervals %}{{ interval.avg }}{% if not loop.last %}, {% endif %}{% endfor %}]
         responseTimeLineGraph = new Highcharts.Chart(responseTimeLineGraphOptions)
 
         // render the response time scatter graph
-        responseTimeScatterGraphOptions.series[0].data = [{% for elapsed, value in trans_timer_points %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeScatterGraphOptions.series[0].data = [0, {% for elapsed, value in trans_timer_points %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}]
         responseTimeScatterGraph = new Highcharts.Chart(responseTimeScatterGraphOptions)
 
         // render the throughput graph
-        throuputGraphOptions.series[0].data = [{% for interval, point in throughput_points.items() %}{{ point }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        throuputGraphOptions.series[0].data = [0, {% for interval, point in throughput_points.items() %}{{ point }}{% if not loop.last %}, {% endif %}{% endfor %}]
         throughputGraph = new Highcharts.Chart(throuputGraphOptions)
       });
     </script>
@@ -295,9 +315,9 @@
       </section>
 
       <h3>Graphs</h3>
-      <div id="responseTimeLineGraph"></div>
-      <div id="responseTimeScatterGraph"></div>
-      <div id="throughputGraph"></div>
+      <div id="responseTimeLineGraph" class="graph"></div>
+      <div id="responseTimeScatterGraph" class="graph"></div>
+      <div id="throughputGraph" class="graph"></div>
 
       <footer class="footer">
         <p>Results generated using <b>Multi-Mechanize</b></p>
