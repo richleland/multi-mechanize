@@ -90,11 +90,6 @@
           },
           min: 0
         },
-        plotOptions: {
-          line: {
-            pointStart: 0
-          }
-        },
         series: [
           {
             name: 'response time'
@@ -153,7 +148,7 @@
         responseTimeLineGraph = new Highcharts.Chart(responseTimeLineGraphOptions)
 
         // render the response time scatter graph
-        responseTimeScatterGraphOptions.series[0].data = [0, {% for elapsed, value in trans_timer_points %}{{ value }}{% if not loop.last %}, {% endif %}{% endfor %}]
+        responseTimeScatterGraphOptions.series[0].data = [[0, 0], {% for elapsed, value in trans_timer_points %}[{{ elapsed }}, {{ value }}]{% if not loop.last %}, {% endif %}{% endfor %}]
         responseTimeScatterGraph = new Highcharts.Chart(responseTimeScatterGraphOptions)
 
         // render the throughput graph
