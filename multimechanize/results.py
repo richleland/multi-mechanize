@@ -98,7 +98,7 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         interval['count'] = cnt
 
         if cnt > 0:
-            interval['rate'] = cnt / float(interval_secs)
+            interval['rate'] = '%.3f' % (cnt / float(interval_secs))
             interval['min'] = '%.3f' % min(bucket)
             interval['avg'] = '%.3f' % average(bucket)
             interval['pct_80'] = '%.3f' % percentile(bucket, 80)
@@ -188,7 +188,7 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
             interval['count'] = cnt
 
             if cnt > 0:
-                interval['rate'] = cnt / float(interval_secs)
+                interval['rate'] = '%.3f' % (cnt / float(interval_secs))
                 interval['min'] = '%.3f' % min(bucket)
                 interval['avg'] = '%.3f' % average(bucket)
                 interval['pct_80'] = '%.3f' % percentile(bucket, 80)
