@@ -132,7 +132,8 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         timer = {
             'name': timer_name,
             'throughput_points': {},
-            'summary': {}
+            'summary': {},
+            'intervals': []
         }
 
         custom_timer_vals = []
@@ -164,49 +165,47 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
             'stdev': '%.3f' % standard_dev(custom_timer_vals),
         }
 
-        custom_timers.append(timer)
-
         # custom timers - interval details
-        #avg_resptime_points = {}  # {intervalnumber: avg_resptime}
-        #percentile_80_resptime_points = {}  # {intervalnumber: 80pct_resptime}
-        #percentile_90_resptime_points = {}  # {intervalnumber: 90pct_resptime}
-        #interval_secs = ts_interval
-        #splat_series = split_series(custom_timer_points, interval_secs)
-        #report.write_line('<h3>Interval Details (secs)</h3>')
-        #report.write_line('<table>')
-        #report.write_line('<tr><th>interval</th><th>count</th><th>rate</th><th>min</th><th>avg</th><th>80pct</th><th>90pct</th><th>95pct</th><th>max</th><th>stdev</th></tr>')
-        #for i, bucket in enumerate(splat_series):
-            #interval_start = int((i + 1) * interval_secs)
-            #cnt = len(bucket)
+        interval_secs = ts_interval
+        splat_series = split_series(custom_timer_points, interval_secs)
 
-            #if cnt == 0:
-                #report.write_line('<tr><td>%i</td><td>0</td><td>0</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td></tr>' % (i + 1))
-            #else:
-                #rate = cnt / float(interval_secs)
-                #mn = min(bucket)
-                #avg = average(bucket)
-                #pct_80 = percentile(bucket, 80)
-                #pct_90 = percentile(bucket, 90)
-                #pct_95 = percentile(bucket, 95)
-                #mx = max(bucket)
-                #stdev = standard_dev(bucket)
+        for i, bucket in enumerate(splat_series):
+            interval = {
+                'num': i + 1,
+                'count': 0,
+                'rate': None,
+                'min': None,
+                'avg': None,
+                'pct_80': None,
+                'pct_90': None,
+                'pct_95': None,
+                'max': None,
+                'stdev': None
+            }
 
-                #report.write_line('<tr><td>%i</td><td>%i</td><td>%.2f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td></tr>' % (i + 1, cnt, rate, mn, avg, pct_80, pct_90, pct_95, mx, stdev))
+            interval_start = int((i + 1) * interval_secs)
+            cnt = len(bucket)
+            interval['count'] = cnt
 
-                #avg_resptime_points[interval_start] = avg
-                #percentile_80_resptime_points[interval_start] = pct_80
-                #percentile_90_resptime_points[interval_start] = pct_90
-        #report.write_line('</table>')
+            if cnt > 0:
+                interval['rate'] = cnt / float(interval_secs)
+                interval['min'] = '%.3f' % min(bucket)
+                interval['avg'] = '%.3f' % average(bucket)
+                interval['pct_80'] = '%.3f' % percentile(bucket, 80)
+                interval['pct_90'] = '%.3f' % percentile(bucket, 90)
+                interval['pct_95'] = '%.3f' % percentile(bucket, 95)
+                interval['max'] = '%.3f' % max(bucket)
+                interval['stdev'] = '%.3f' % standard_dev(bucket)
+
+                avg_resptime_points[interval_start] = interval['avg']
+                percentile_80_resptime_points[interval_start] = interval['pct_80']
+                percentile_90_resptime_points[interval_start] = interval['pct_90']
+
+            timer['intervals'].append(interval)
         #graph.resp_graph(avg_resptime_points, percentile_80_resptime_points, percentile_90_resptime_points, timer_name + '_response_times_intervals.png', results_dir)
 
-
-        #report.write_line('<h3>Graphs</h3>')
-        #report.write_line('<h4>Response Time: %s sec time-series</h4>' % ts_interval)
-        #report.write_line('<img src="%s_response_times_intervals.png"></img>' % timer_name)
-        #report.write_line('<h4>Response Time: raw data (all points)</h4>')
-        #report.write_line('<img src="%s_response_times.png"></img>' % timer_name)
-        #report.write_line('<h4>Throughput: %s sec time-series</h4>' % ts_interval)
-        #report.write_line('<img src="%s_throughput.png"></img>' % timer_name)
+        # add this timer to the list of custom timers
+        custom_timers.append(timer)
 
     ### user group times
     ##for user_group_name in sorted(results.uniq_user_group_names):
@@ -234,9 +233,6 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         'ts_interval': ts_interval,
         'user_group_configs': user_group_configs,
         'transaction_summary': transaction_summary,
-        'points_avg': avg_resptime_points,
-        'points_pct_80': percentile_80_resptime_points,
-        'points_pct_90': percentile_90_resptime_points,
         'intervals': intervals,
         'trans_timer_points': trans_timer_points,
         'throughput_points': throughput_points,
