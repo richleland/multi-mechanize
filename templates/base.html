@@ -171,7 +171,7 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Custom timers<b class="caret"></b></a>
               <ul class="dropdown-menu">
                 {% for timer in custom_timers -%}
-                <li><a href="custom-timer-{{ loop.index }}">{{ timer.timer_name }}</a></li>
+                <li><a href="custom-timer-{{ loop.index }}">{{ timer.name }}</a></li>
                 {%- endfor %}
               </ul>
             </li>
@@ -318,7 +318,7 @@
       {% for timer in custom_timers %}
       <section id="custom-timer-{{ loop.index }}">
         <div class="page-header">
-          <h2>Custom timer: {{ timer.timer_name }}</h2>
+          <h2>Custom timer: {{ timer.name }}</h2>
         </div>
         <h3>Timer summary (secs)</h3>
         <table class="table table-striped table-bordered table-condensed">
