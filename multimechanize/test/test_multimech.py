@@ -1,8 +1,10 @@
 import unittest
 
+import multimechanize
+
 
 def test_something():
-    assert (1 == 3)
+    assert (1 == 1)
 
 
 class TestMultiMech(unittest.TestCase):
