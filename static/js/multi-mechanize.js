@@ -3,7 +3,8 @@ var responseTimeLineGraphOptions = {
     defaultSeriesType: 'line',
     animation: false,
     borderColor: '#E5E5E5',
-    borderWidth: 1
+    borderWidth: 1,
+    width: 940
   },
   legend: {
     align: 'right',
@@ -53,7 +54,8 @@ var responseTimeScatterGraphOptions = {
     defaultSeriesType: 'scatter',
     animation: false,
     borderColor: '#E5E5E5',
-    borderWidth: 1
+    borderWidth: 1,
+    width: 940
   },
   legend: {
     enabled: false
@@ -86,7 +88,8 @@ var throuputGraphOptions = {
     defaultSeriesType: 'line',
     animation: false,
     borderColor: '#E5E5E5',
-    borderWidth: 1
+    borderWidth: 1,
+    width: 940
   },
   legend: {
     enabled: false
