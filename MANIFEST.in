@@ -3,4 +3,6 @@ include requirements.txt
 include README.rst
 include MANIFEST.in
 recursive-include multimechanize *.py
+recursive-include multimechanize/static *
+recursive-include multimechanize/templates *
 recursive-include examples *.py *.cfg

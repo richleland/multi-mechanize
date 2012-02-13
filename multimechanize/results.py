@@ -12,7 +12,7 @@ import time
 from collections import defaultdict
 from shutil import copytree
 
-from jinja2 import Environment, FileSystemLoader, PackageLoader, Template
+from jinja2 import Environment, PackageLoader
 
 #import graph
 #import reportwriter
@@ -23,7 +23,7 @@ def copy_static_media(results_dir):
     """
     Copies static media into the results folder.
     """
-    static_dir = os.path.join(os.path.dirname(__file__), '..', 'static')
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
     destination = os.path.abspath(os.path.join(results_dir, '..', 'static'))
     try:
         copytree(static_dir, destination)
@@ -36,9 +36,7 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     """
     copy_static_media(results_dir)
 
-    #env = Environment(loader=PackageLoader('multimechanize', 'templates'))
-    template_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
-    env = Environment(loader=FileSystemLoader(template_dir))
+    env = Environment(loader=PackageLoader('multimechanize', 'templates'))
     template = env.get_template('base.html')
 
     # parse the results and prepare them for the template
