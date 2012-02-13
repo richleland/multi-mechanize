@@ -5,33 +5,20 @@
 #
 #  This file is part of Multi-Mechanize | Performance Test Framework
 #
-
-
-
 import ConfigParser
 import multiprocessing
 import optparse
 import os
-import Queue
 import shutil
 import subprocess
 import sys
 import time
 
-try:
-    # installed
-    import multimechanize
-except ImportError:
-    # from dev/source
-    this_dir = os.path.abspath(os.path.dirname(__file__))
-    sys.path.append(os.path.join(this_dir, '../../'))
-    import multimechanize
-
 import multimechanize.core as core
 import multimechanize.results as results
 import multimechanize.resultswriter as resultswriter
 import multimechanize.progressbar as progressbar
-    
+
 
 usage = 'Usage: %prog <project name> [options]'
 parser = optparse.OptionParser(usage=usage)
