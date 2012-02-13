@@ -1,5 +1,7 @@
 *.nja
 *.pyc
+.coverage
+.tox
 _build
 build
 dist
