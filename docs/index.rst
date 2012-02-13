@@ -1,3 +1,4 @@
+.. include:: <isonum.txt>
 
 ================================================
     Multi-Mechanize | Performance Test Framework
@@ -13,11 +14,11 @@
 
 ----
 
-:Web: http://multimechanize.com
-:PyPI: http://pypi.python.org/pypi/multi-mechanize
-:Dev: http://github.com/cgoldberg/multi-mechanize
-:License: GNU LGPLv3
-:Author: Copyright (c) 2010-2012 Corey Goldberg
+:Web: `multimechanize.com <http://multimechanize.com>`_
+:PyPI: `multi-mechanize package <http://pypi.python.org/pypi/multi-mechanize>`_
+:Dev: `GitHub <http://github.com/cgoldberg/multi-mechanize>`_
+:License: `GNU LGPLv3 <http://www.gnu.org/licenses/lgpl.html>`_
+:Author: `Corey Goldberg <http://goldb.org>`_ - copyright |copy| 2010-2012
 
 ----
 
@@ -25,12 +26,15 @@
     Performance & Load Tests in Python
 **************************************
 
-Multi-Mechanize is an open source framework for API performance and load testing. 
-It allows you to run simultaneous Python scripts to generate synthetic transactions 
-against a web site or service.
-    
-Test output reports are saved as HTML (with PNG graphs), or JUnit-compatible XML 
-for compatibility with CI systems.
+Multi-Mechanize is an open source framework for performance and load testing. 
+It runs concurrent Python scripts to generate load (synthetic transactions) 
+against a remote site or service.
+
+Multi-Mechanize is most commonly used for web performance and scalability 
+testing, but can be used to generate workload against any remote API accessible 
+from Python.
+
+Test output reports are saved as HTML or JMeter-compatible XML.
 
 *************
     Site Menu
@@ -39,10 +43,11 @@ for compatibility with CI systems.
 .. toctree::
     :maxdepth: 1
     
+    setup
     configfile
     scripts
-    graphs
-    faq
+    reports
+    datastore
     dev
     changelog
     
@@ -50,9 +55,9 @@ for compatibility with CI systems.
     Discussion / Help / Updates
 *******************************
 
-* IRC: #multimech (freenode)
-* Google Group: http://groups.google.com/group/multi-mechanize
-* Twitter: http://twitter.com/multimechanize
+* IRC: `Freenode <http://freenode.net/>`_ ``#multimech`` channel
+* Mailing List: `Google Group <http://groups.google.com/group/multi-mechanize>`_
+* Twitter: `twitter.com/multimechanize <http://twitter.com/multimechanize>`_
 
 *******************
     Install / Setup
@@ -66,63 +71,84 @@ Multi-Mechanize can be installed from `PyPI <http://pypi.python.org/pypi/multi-m
 
     python setup.py install
 
-Once installed, you can create a new project::
+(for more setup and installation instructions, see :ref:`setup-label`)
+
+**********************
+    Usage Instructions
+**********************
+
+--------------------
+    Create a Project
+--------------------
+
+Create a new test project with ``multimech-newproject``::
 
     $ multimech-newproject my_project
 
-and run a project::
+Each test project contains the following:
+
+ * ``config.cfg``: configuration file. set your test options here.
+ * ``test_scripts/``: directory for virtual user scripts. add your test scripts here.
+ * ``results/``: directory for results storage. a timestamped directory is created for each test run, containing the results report.
+
+``multimech-newproject`` will create a mock project, using a single script that generates random timer data.  Check it out for a basic example. 
+
+-----------------
+    Run a Project
+-----------------
+
+Run a test project with ``multimech-run``::
 
     $ multimech-run my_project
-    
-----
 
-The following detailed instructions are for Debian/Ubuntu Linux. 
-For other platforms, the setup is generally the same, with the 
-exeption of installing system dependencies.  
+* for test configuration options, see :ref:`config-label`
+* a timestamped ``results`` directory is created for each test run, containing the results report.
 
------------------------
-    system-wide install
------------------------
+************************
+    Test Scripts
+************************
 
-* install dependencies on Debian/Ubuntu::
+--------------------------
+    Virtual User Scripting
+--------------------------
 
-    $ sudo apt-get install python-pip python-matplotlib
-    
-* install multi-mechanize from PyPI using Pip::
+* written in Python
+* test scripts simulate virtual user activity against a site/service/api
+* scripts define user transactions
+* for help developing scripts, see :ref:`scripts-label`
 
-    $ sudo pip install -U multi-mechanize
+------------
+    Examples
+------------
 
--------------------------------------------------------------
-    virtualenv + pip install (with matplotlib system package)
--------------------------------------------------------------
+HTTP GETs using `Requests <http://docs.python-requests.org/>`_::
 
-* install dependencies on Debian/Ubuntu::
+    import requests
 
-    $ sudo apt-get install python-virtualenv python-matplotlib
+    class Transaction(object):
+        def run(self):
+            r = requests.get('https://github.com/timeline.json')
+            r.raw.read()
 
-* install multi-mechanize from PyPI in a virtualenv::
+HTTP GETs using `Mechanize <http://wwwsearch.sourceforge.net/mechanize/>`_ (with timer and assertions)::
 
-    $ virtualenv --system-site-packages ENV
-    $ cd ENV
-    $ source bin/activate
-    (ENV)$ pip install multi-mechanize
-    
-------------------------------------------------------
-    virtualenv + pip install (with --no-site-packages)
-------------------------------------------------------
+    import mechanize
+    import time
 
-* install dependencies on Debian/Ubuntu::
-
-    $ sudo apt-get install build-essential libfreetype6-dev libpng-dev
-    $ sudo apt-get install python-dev python-virtualenv
-
-* install multi-mechanize and matplotlib from PyPI in a virtualenv::
-
-    $ virtualenv ENV
-    $ cd ENV
-    $ source bin/activate
-    (ENV)$ pip install multi-mechanize
-    (ENV)$ pip install matplotlib
+    class Transaction(object):
+        def run(self):
+            br = mechanize.Browser()
+            br.set_handle_robots(False)
+            
+            start_timer = time.time()
+            resp = br.open('http://www.example.com/')
+            resp.read()
+            latency = time.time() - start_timer
+            
+            self.custom_timers['Example_Homepage'] = latency
+            
+            assert (resp.code == 200)
+            assert ('Example Web Page' in resp.get_data())
 
 ----
 
