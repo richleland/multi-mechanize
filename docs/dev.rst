@@ -22,6 +22,19 @@ Multi-Mechanize development is hosted at GitHub and uses
 * IRC: `Freenode <http://freenode.net/>`_ ``#multimech`` channel
 * Mailing List: `Google Group <http://groups.google.com/group/multi-mechanize>`_
 
+***********
+    Testing
+***********
+
+The Multi-Mechanize tests use `tox`_, `py.test`_ and `coverage`_. To run the tests, run the following from your clone's root directory::
+
+    pip install tox
+    tox
+
+.. _tox: http://tox.readthedocs.org/
+.. _py.test: http://pytest.org/
+.. _coverage: http://nedbatchelder.com/code/coverage/
+
 **********
     Issues
 **********
