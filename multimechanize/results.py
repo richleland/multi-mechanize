@@ -60,6 +60,14 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
     # MATPLOTLIB GRAPH WAS CREATED HERE USING THE FOLLOWING CALL:
     # graph.resp_graph_raw(trans_timer_points, 'All_Transactions_response_times.png', results_dir)
 
+    # we need a smaller number of transaction timer points for client-side rendering
+    max_timer_points = 1000
+    reduced_trans_timer_points = trans_timer_points
+    if len(trans_timer_points) > max_timer_points:
+        frequency = len(trans_timer_points)/float(max_timer_points)
+        frequency = int(round(frequency))
+        reduced_trans_timer_points = trans_timer_points[::frequency]
+
     # all transactions - transaction response summary
     transaction_summary = {
         'count': results.total_transactions,
@@ -149,6 +157,14 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         timer['trans_timer_points'] = custom_timer_points
         #graph.resp_graph_raw(custom_timer_points, timer_name + '_response_times.png', results_dir)
 
+        # we need a smaller number of transaction timer points for client-side rendering
+        timer['reduced_trans_timer_points'] = custom_timer_points
+        if len(custom_timer_points) > 1000:
+            frequency = len(custom_timer_points)/float(max_timer_points)
+            frequency = int(round(frequency))
+            timer['reduced_trans_timer_points'] = custom_timer_points[::frequency]
+
+
         interval_secs = ts_interval
         splat_series = split_series(custom_timer_points, interval_secs)
         for i, bucket in enumerate(splat_series):
@@ -222,6 +238,7 @@ def output_results(results_dir, results_file, run_time, rampup, ts_interval, use
         'transaction_summary': transaction_summary,
         'intervals': intervals,
         'trans_timer_points': trans_timer_points,
+        'reduced_trans_timer_points': reduced_trans_timer_points,
         'throughput_points': throughput_points,
         'custom_timers': custom_timers,
     })

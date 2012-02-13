@@ -22,9 +22,10 @@
           [0, {% for interval in intervals %}{{ interval.pct_80 }}{% if not loop.last %}, {% endif %}{% endfor %}],
           [0, {% for interval in intervals %}{{ interval.avg }}{% if not loop.last %}, {% endif %}{% endfor %}]
         ];
-        var allScatterData = [[0, 0], {% for elapsed, value in trans_timer_points %}[{{ elapsed }}, {{ value }}]{% if not loop.last %}, {% endif %}{% endfor %}];
+        var allScatterTitle = 'Response Time: raw data ({{ reduced_trans_timer_points|length}} points)';
+        var allScatterData = [[0, 0], {% for elapsed, value in reduced_trans_timer_points %}[{{ elapsed }}, {{ value }}]{% if not loop.last %}, {% endif %}{% endfor %}];
         var allTputData = [0, {% for interval, point in throughput_points.items() %}{{ point }}{% if not loop.last %}, {% endif %}{% endfor %}];
-        generateCharts('all', tsInterval, lineGraphTitle, allResponseTimeData, allScatterData, throughputTitle, allTputData);
+        generateCharts('all', tsInterval, lineGraphTitle, allResponseTimeData, allScatterTitle, allScatterData, throughputTitle, allTputData);
 
         {% if custom_timers %}
         // render the graphs for the custom timers
@@ -34,9 +35,10 @@
           [0, {% for interval in timer.intervals %}{{ interval.pct_80 }}{% if not loop.last %}, {% endif %}{% endfor %}],
           [0, {% for interval in timer.intervals %}{{ interval.avg }}{% if not loop.last %}, {% endif %}{% endfor %}]
         ];
-        var timerScatterData = [[0, 0], {% for elapsed, value in timer.trans_timer_points %}[{{ elapsed }}, {{ value }}]{% if not loop.last %}, {% endif %}{% endfor %}];
+        var timerScatterTitle = 'Response Time: raw data ({{ timer.reduced_trans_timer_points|length}} points)';
+        var timerScatterData = [[0, 0], {% for elapsed, value in timer.reduced_trans_timer_points %}[{{ elapsed }}, {{ value }}]{% if not loop.last %}, {% endif %}{% endfor %}];
         var timerTputData = [0, {% for interval, point in timer.throughput_points.items() %}{{ point }}{% if not loop.last %}, {% endif %}{% endfor %}];
-        generateCharts('timer-{{ loop.index }}', tsInterval, lineGraphTitle, timerResponseTimeData, timerScatterData, throughputTitle, timerTputData);
+        generateCharts('timer-{{ loop.index }}', tsInterval, lineGraphTitle, timerResponseTimeData, timerScatterTitle, timerScatterData, throughputTitle, timerTputData);
         {% endfor %}
         {% endif %}
       });

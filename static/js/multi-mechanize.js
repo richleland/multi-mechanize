@@ -61,7 +61,7 @@ var responseTimeScatterGraphOptions = {
     enabled: false
   },
   title: {
-    text: 'Response Time: raw data (all points)'
+    text: ''
   },
   xAxis: {
     title: {
@@ -123,7 +123,7 @@ var throuputGraphOptions = {
 };
 
 var charts = {};
-var generateCharts = function(timerName, tsInterval, lineTitle, lineData, scatterData, tputTitle, tputData) {
+var generateCharts = function(timerName, tsInterval, lineTitle, lineData, scatterTitle, scatterData, tputTitle, tputData) {
   
   // render the response time line graph
   var divName = 'responseTimeLineGraph-' + timerName;
@@ -138,6 +138,7 @@ var generateCharts = function(timerName, tsInterval, lineTitle, lineData, scatte
   // render the response time scatter graph
   divName = 'responseTimeScatterGraph-' + timerName;
   responseTimeScatterGraphOptions.chart.renderTo = divName;
+  responseTimeScatterGraphOptions.title.text = scatterTitle;
   responseTimeScatterGraphOptions.series[0].data = scatterData;
   charts[divName] = new Highcharts.Chart(responseTimeScatterGraphOptions);
 
